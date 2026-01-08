@@ -3,12 +3,22 @@ const express=require("express");
 const cors=require("cors");
 const multer=require("multer");
 const jwt =require("jsonwebtoken");
+const dotenv=require("dotenv");
+dotenv.config();
 let app=express();
 app.use(cors());
 
 app.use(express.json());
 
-app.use("/Profilepics",express.static("Profilepics"))
+app.use("/Profilepics",express.static("Profilepics"));
+
+const path=require("path");
+
+app.use(express.static(path.join(__dirname, "client/build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname + "/client/build/index.html"));
+});
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -93,8 +103,8 @@ app.post("/login",upload.none(),async(req,res)=>{
 
 })
 
-app.listen(4545,()=>{
-      console.log("server is running on port 4545")
+app.listen(process.env.PORT,()=>{
+      console.log(`server is running on port ${process.env.PORT}`);
 })
 let employeeSchema=new mongoose.Schema({
     firstname:String,
@@ -109,7 +119,7 @@ let user= new mongoose.model("salaar",employeeSchema,"EmployeeDetails")
 
 let connectTodatabase=async()=>{
 try {
-    await mongoose.connect("mongodb+srv://charansaiakula:Charan000@cluster14.x3bilfl.mongodb.net/btchbrnn?appName=Cluster14")
+    await mongoose.connect(process.env.MDBURL);
     console.log("connected to database")
    
 } catch (error) {
